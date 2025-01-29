@@ -27,7 +27,7 @@ st.set_page_config(layout="wide")
 
 def load_sample_data():
     """Load sample JSON data from a URL."""
-    sample_data_url = "https://github.com/binaryzer0/rsu-calculator/blob/449666f16b5ab1c356f3746077863f5de722432d/sample.json" 
+    sample_data_url = "https://github.com/binaryzer0/rsu-calculator/raw/449666f16b5ab1c356f3746077863f5de722432d/sample.json" 
     try:
         response = requests.get(sample_data_url)
         response.raise_for_status()  # Raise an error for bad status codes
