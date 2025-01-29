@@ -485,6 +485,18 @@ def main():
         "All values are assumed in a single currency.\n\n"
         "As always, use at your own risk and this is not a financial advice at all."
     )
+    # https://buymeacoffee.com/binaryzer0
+    st.sidebar.markdown("### ☕ Support This Project")
+    st.sidebar.markdown(
+        """
+        <a href="https://buymeacoffee.com/binaryzer0" target="_blank">
+            <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" 
+                alt="Buy Me A Coffee" 
+                width="200">
+        </a>
+        """,
+        unsafe_allow_html=True
+    )
 
     # Add Grant, Vest, and Sale forms
     add_grant_form()
