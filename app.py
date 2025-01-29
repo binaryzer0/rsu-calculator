@@ -451,7 +451,7 @@ def add_summary_section():
 
 def main():
     st.title("RSU Tax Calculator")
-    st.markdown("*Sample data:* ***https://github.com/binaryzer0/rsu-calculator/raw/refs/heads/main/sample.json***")
+    st.markdown("*Sample data available at:* ***https://raw.githubusercontent.com/binaryzer0/rsu-calculator/main/sample.json***")
     st.sidebar.header("Navigation")
 
     if "grants" not in st.session_state:
