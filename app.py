@@ -454,7 +454,7 @@ def main():
         st.plotly_chart(tax_breakdown_fig)
         tax_breakdown_table = generate_tax_breakdown_table(st.session_state.get("grants", []))
         if tax_breakdown_table is not None:
-            st.write("**Tax type breakdown by Australian Financial year**")
+            st.write("**Tax type breakdown by Australian Financial year table**")
             st.dataframe(tax_breakdown_table)
 
     # Capital Gains by Vest
@@ -463,7 +463,7 @@ def main():
         st.plotly_chart(capital_gains_fig)
         capital_gains_table = generate_capital_gains_table(st.session_state.get("grants", []))
         if capital_gains_table is not None:
-            st.write("**Capital Gains/Loss Table by Australian Financial year**")
+            st.write("**Capital Gains/Loss Table by Australian Financial year table**")
             st.dataframe(capital_gains_table)
 
     # Net Gains
@@ -481,7 +481,7 @@ def main():
         st.plotly_chart(stock_performance_fig)
         stock_performance_table = generate_stock_performance_table(st.session_state.get("grants", []))
         if stock_performance_table is not None:
-            st.write("**Stock Performance against each Vest table**")
+            st.write("**Stock Performance (Vest Price vs. Sale Price) table**")
             st.dataframe(stock_performance_table)
 
 if __name__ == "__main__":
