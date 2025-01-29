@@ -470,21 +470,39 @@ def main():
     if imported_data:
         st.session_state["grants"] = imported_data
         st.session_state["data_loaded"] = True
-
-
     
     # Sidebar details
     st.sidebar.header("About This App")
-    st.sidebar.info(
-        "**RSU Tax Calculator – Simplify Your Equity Taxes**\n\n"
-        "Easily manage your Restricted Stock Units (RSUs) with this intuitive tax calculator. "
-        "Track grants, vesting, and sales while automatically calculating taxes at each stage. "
-        "Visualize your tax breakdown, capital gains, and stock performance with interactive charts. "
-        "Stay in control of your RSU strategy and maximize your financial outcomes—all in one place."
-        "Data is stored in the browser session so no data is sent back to server."
-        "All values are assumed in a single currency.\n\n"
-        "As always, use at your own risk and this is not a financial advice at all."
+    st.sidebar.markdown(
+        """
+        <style>
+        .small-font {
+            font-size: 12px;  /* Adjust size as needed */
+        }
+        </style>
+        <div class="small-font">
+            <strong>RSU Tax Calculator – Simplify Your Equity Taxes</strong><br><br>
+                Easily manage your Restricted Stock Units (RSUs) with this intuitive tax calculator.
+                Track grants, vesting, and sales while automatically calculating taxes at each stage.
+                Visualize your tax breakdown, capital gains, and stock performance with interactive charts.
+                Stay in control of your RSU strategy and maximize your financial outcomes—all in one place.
+                Data is stored in the browser session so no data is sent back to server."
+                All values are assumed in a single currency.\n\n
+                As always, use at your own risk and this is not a financial advice at all.
+        </div>
+        """,
+        unsafe_allow_html=True
     )
+    # st.sidebar.info(
+    #     "**RSU Tax Calculator – Simplify Your Equity Taxes**\n\n"
+    #     "Easily manage your Restricted Stock Units (RSUs) with this intuitive tax calculator. "
+    #     "Track grants, vesting, and sales while automatically calculating taxes at each stage. "
+    #     "Visualize your tax breakdown, capital gains, and stock performance with interactive charts. "
+    #     "Stay in control of your RSU strategy and maximize your financial outcomes—all in one place."
+    #     "Data is stored in the browser session so no data is sent back to server."
+    #     "All values are assumed in a single currency.\n\n"
+    #     "As always, use at your own risk and this is not a financial advice at all."
+    # )
     # https://buymeacoffee.com/binaryzer0
     st.sidebar.markdown("### ☕ Support This Project")
     st.sidebar.markdown(
