@@ -458,20 +458,7 @@ def main():
 
     if "grants" not in st.session_state:
         st.session_state["grants"] = []
-
-    # Add a button to load sample data
-    st.sidebar.header("Try it")
-    if st.sidebar.button("Load Sample Data"):
-        load_sample_data()
-    
-    # Export/Import functionality
-    st.sidebar.header("Export/Import Data")
-    export_data(st.session_state["grants"])
-    imported_data = import_data()
-    if imported_data:
-        st.session_state["grants"] = imported_data
-        st.session_state["data_loaded"] = True
-    
+  
     # Sidebar details
     st.sidebar.header("About This App")
     st.sidebar.markdown(
@@ -505,6 +492,20 @@ def main():
     #     "As always, use at your own risk and this is not a financial advice at all."
     # )
     # https://buymeacoffee.com/binaryzer0
+
+    # Add a button to load sample data
+    st.sidebar.header("Try it")
+    if st.sidebar.button("Load Sample Data"):
+        load_sample_data()
+    
+    # Export/Import functionality
+    st.sidebar.header("Export/Import Data")
+    export_data(st.session_state["grants"])
+    imported_data = import_data()
+    if imported_data:
+        st.session_state["grants"] = imported_data
+        st.session_state["data_loaded"] = True
+    
     st.sidebar.markdown("### ☕ Support This Project")
     st.sidebar.markdown(
         """
