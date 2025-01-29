@@ -452,6 +452,7 @@ def add_summary_section():
 def main():
     st.title("RSU Tax Calculator")
     st.markdown("*Sample data available at:* ***https://raw.githubusercontent.com/binaryzer0/rsu-calculator/main/sample.json***")
+    st.markdown("***This app allows you to load RSU/Stocks data and calculate taxes for Australian financial year. Data is stored in the browser session so no data is sent back to server. As always, use at your own risk and this is not a financial advice at all.***")
     st.sidebar.header("Navigation")
 
     if "grants" not in st.session_state:
