@@ -5,6 +5,7 @@
 # 3. The Summary section is not included in the export.
 
 import streamlit as st
+import requests
 import pandas as pd
 from utils.calculations import calculate_tax_at_vest, calculate_capital_gains_tax, calculate_gains_at_sale
 from utils.data_handling import export_data, import_data
@@ -24,6 +25,19 @@ from utils.visualization import (
 # Set page configuration (wide mode)
 st.set_page_config(layout="wide")
 
+def load_sample_data():
+    """Load sample JSON data from a URL."""
+    sample_data_url = "https://github.com/binaryzer0/rsu-calculator/raw/refs/heads/main/sample.json" 
+    try:
+        response = requests.get(sample_data_url)
+        response.raise_for_status()  # Raise an error for bad status codes
+        sample_data = response.json()
+        st.session_state["grants"] = sample_data
+        st.session_state["data_loaded"] = True
+        st.success("Sample data loaded successfully!")
+    except Exception as e:
+        st.error(f"Failed to load sample data: {e}")
+        
 def add_grant_form():
     with st.expander("Add/Edit Grants", expanded=not st.session_state.get("data_loaded", False)):
         if "grants" not in st.session_state:
@@ -437,6 +451,10 @@ def main():
         st.session_state["grants"] = imported_data
         st.session_state["data_loaded"] = True
 
+    # Add a button to load sample data
+    if st.sidebar.button("Load Sample Data"):
+        load_sample_data()
+    
     # Add Grant, Vest, and Sale forms
     add_grant_form()
     add_vest_form()
