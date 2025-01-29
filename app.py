@@ -460,6 +460,7 @@ def main():
         st.session_state["grants"] = []
 
     # Add a button to load sample data
+    st.sidebar.header("Try it")
     if st.sidebar.button("Load Sample Data"):
         load_sample_data()
     
@@ -477,7 +478,7 @@ def main():
         """
         <style>
         .small-font {
-            font-size: 14px;  /* Adjust size as needed */
+            font-size: 13px;  /* Adjust size as needed */
         }
         </style>
         <div class="small-font">
@@ -486,8 +487,8 @@ def main():
                 Track grants, vesting, and sales while automatically calculating taxes at each stage.
                 Visualize your tax breakdown, capital gains, and stock performance with interactive charts.
                 Stay in control of your RSU strategy and maximize your financial outcomes—all in one place.
-                Data is stored in the browser session so no data is sent back to server."
-                All values are assumed in a single currency.<br>
+                Data is stored in the browser session so no data is sent back to server.
+                All values are assumed in a single currency.<br><br>
                 As always, use at your own risk and this is not a financial advice at all.
         </div>
         """,
