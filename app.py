@@ -459,6 +459,10 @@ def main():
     if "grants" not in st.session_state:
         st.session_state["grants"] = []
 
+    # Add a button to load sample data
+    if st.sidebar.button("Load Sample Data"):
+        load_sample_data()
+    
     # Export/Import functionality
     st.sidebar.header("Export/Import Data")
     export_data(st.session_state["grants"])
@@ -467,9 +471,7 @@ def main():
         st.session_state["grants"] = imported_data
         st.session_state["data_loaded"] = True
 
-    # Add a button to load sample data
-    if st.sidebar.button("Load Sample Data"):
-        load_sample_data()
+
     
     # Sidebar details
     st.sidebar.header("About This App")
