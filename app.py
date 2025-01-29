@@ -7,6 +7,10 @@
 import streamlit as st
 import requests
 import pandas as pd
+import requests
+import pandas as pd
+import json
+from datetime import datetime
 from utils.calculations import calculate_tax_at_vest, calculate_capital_gains_tax, calculate_gains_at_sale
 from utils.data_handling import export_data, import_data
 from utils.visualization import (
@@ -25,6 +29,16 @@ from utils.visualization import (
 # Set page configuration (wide mode)
 st.set_page_config(layout="wide")
 
+# Parse dates when using requests URL
+def parse_dates(data):
+    for grant in data:
+        grant['grant_date'] = datetime.strptime(grant['grant_date'], '%Y-%m-%d').date()
+        for vest in grant['vests']:
+            vest['vest_date'] = datetime.strptime(vest['vest_date'], '%Y-%m-%d').date()
+        for sale in grant['sales']:
+            sale['sale_date'] = datetime.strptime(sale['sale_date'], '%Y-%m-%d').date()
+    return data
+    
 def load_sample_data():
     """Load sample JSON data from a URL."""
     sample_data_url = "https://github.com/binaryzer0/rsu-calculator/raw/449666f16b5ab1c356f3746077863f5de722432d/sample.json" 
@@ -32,7 +46,7 @@ def load_sample_data():
         response = requests.get(sample_data_url)
         response.raise_for_status()  # Raise an error for bad status codes
         sample_data = response.json()
-        st.session_state["grants"] = sample_data
+        st.session_state["grants"] = parse_dates(sample_data)
         st.session_state["data_loaded"] = True
         st.success("Sample data loaded successfully!")
     except Exception as e:
