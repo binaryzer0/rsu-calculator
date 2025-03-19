@@ -6,6 +6,14 @@ import pandas as pd
 import streamlit as st
 import plotly.express as px
 
+def calculate_correct_tax(sale, vest):
+    holding_period = (sale["sale_date"] - vest["vest_date"]).days
+    if holding_period <= 30 and "tax_within_30_days" in sale:
+        return sale["tax_within_30_days"]
+    else:
+        return sale["capital_gains_tax"]
+
+
 def display_rsu_details_table(grants):
     if not grants:
         st.warning("No data available. Add grants, vests, and sales to see the details.")
@@ -35,22 +43,25 @@ def display_rsu_details_table(grants):
             st.write("**Sales:**")
             sale_data = []
             for sale in grant["sales"]:
+                vest = next(v for v in grant["vests"] if v["vest_id"] == sale["vest_id"])
+                tax = calculate_correct_tax(sale, vest)
                 sale_data.append({
                     "Sale ID": sale["sale_id"],
                     "Sale Date": sale["sale_date"],
                     "Shares Sold": sale["shares_sold"],
                     "Sale Price": f"${sale['sale_price']}",
-                    "Capital Gains Tax": f"${sale['capital_gains_tax']}",
+                    "Tax at Sale": f"${tax}",
                 })
             st.table(pd.DataFrame(sale_data))
 
         total_tax_at_vest = sum(v["tax_at_vest"] for v in grant.get("vests", []))
-        total_capital_gains_tax = sum(s["capital_gains_tax"] for s in grant.get("sales", []))
+        total_capital_gains_tax = sum(calculate_correct_tax(s, next(v for v in grant["vests"] if v["vest_id"] == s["vest_id"])) for s in grant.get("sales", []))
         totals_data = [{
             "Type": "Totals",
             "Tax at Vest": f"${total_tax_at_vest:,.2f}",
-            "Capital Gains Tax": f"${total_capital_gains_tax:,.2f}",
+            "Tax at Sale": f"${total_capital_gains_tax:,.2f}",
         }]
+
         st.table(pd.DataFrame(totals_data))
         st.write("---")
 
@@ -60,13 +71,13 @@ def display_totals(grants):
         for grant in grants
         for v in grant.get("vests", [])
     )
-    total_capital_gains_tax = sum(
-        s["capital_gains_tax"]
+    total_tax_at_sale = sum(
+        calculate_correct_tax(s, next(v for v in grant["vests"] if v["vest_id"] == s["vest_id"]))
         for grant in grants
         for s in grant.get("sales", [])
     )
     st.write(f"**Total Tax at Vest:** ${total_tax_at_vest:,.2f}")
-    st.write(f"**Total Capital Gains Tax:** ${total_capital_gains_tax:,.2f}")
+    st.write(f"**Total Tax at Sale:** ${total_tax_at_sale:,.2f}")
 
 def get_australian_tax_year(date_obj):
     year = date_obj.year
@@ -88,16 +99,19 @@ def plot_tax_breakdown(grants):
             })
         for sale in grant.get("sales", []):
             tax_year = get_australian_tax_year(sale["sale_date"])
+            vest = next(v for v in grant["vests"] if v["vest_id"] == sale["vest_id"])
+            tax = calculate_correct_tax(sale, vest)
             tax_data.append({
                 "Tax Year": tax_year,
-                "Type": "Capital Gains Tax",
-                "Amount": sale["capital_gains_tax"],
+                "Type": "Tax at Sale",
+                "Amount": tax,
                 "Event ID": f"Sale: {sale['sale_id']}",
                 "Grant ID": grant["grant_id"],
             })
 
     if not tax_data:
         return None
+
 
     df = pd.DataFrame(tax_data)
 
@@ -183,23 +197,25 @@ def plot_net_gains(grants):
         total_tax_at_vest = sum(v["tax_at_vest"] for v in grant.get("vests", []))
         for sale in grant.get("sales", []):
             tax_year = get_australian_tax_year(sale["sale_date"])
-            net_gain = (sale["sale_price"] * sale["shares_sold"]) - sale["capital_gains_tax"]
+            vest = next(v for v in grant["vests"] if v["vest_id"] == sale["vest_id"])
+            tax = calculate_correct_tax(sale, vest)
+            net_gain = (sale["sale_price"] * sale["shares_sold"]) - tax
             net_gains_data.append({
                 "Tax Year": tax_year,
                 "Type": "Net Gain",
                 "Amount": net_gain,
             })
 
-            vest = next(v for v in grant["vests"] if v["vest_id"] == sale["vest_id"])
-            total_taxes_paid = sale["capital_gains_tax"] + vest["tax_at_vest"]
+            
+            total_taxes_paid = tax + vest["tax_at_vest"]
             taxes_data.append({
                 "Tax Year": tax_year,
                 "Type": "Taxes Paid",
                 "Amount": total_taxes_paid,
             })
-
-    if not net_gains_data and not taxes_data:
+    if not net_gains_data:
         return None
+
 
     df = pd.DataFrame(net_gains_data + taxes_data)
     df = df.groupby(["Tax Year", "Type"], as_index=False)["Amount"].sum()
@@ -294,16 +310,18 @@ def generate_tax_breakdown_table(grants):
             })
         for sale in grant.get("sales", []):
             tax_year = get_australian_tax_year(sale["sale_date"])
+            vest = next(v for v in grant["vests"] if v["vest_id"] == sale["vest_id"])
+            tax = calculate_correct_tax(sale, vest)
             tax_data.append({
                 "Tax Year": tax_year,
-                "Type": "Capital Gains Tax",
-                "Amount": sale["capital_gains_tax"],
+                "Type": "Tax at Sale",
+                "Amount": tax,
                 "Grant ID": grant["grant_id"],
                 "Sale ID": sale["sale_id"],
             })
-
     if not tax_data:
         return None
+
 
     return pd.DataFrame(tax_data)
 
@@ -333,7 +351,9 @@ def generate_net_gains_table(grants):
         total_tax_at_vest = sum(v["tax_at_vest"] for v in grant.get("vests", []))
         for sale in grant.get("sales", []):
             tax_year = get_australian_tax_year(sale["sale_date"])
-            net_gain = (sale["sale_price"] * sale["shares_sold"]) - sale["capital_gains_tax"]
+            vest = next(v for v in grant["vests"] if v["vest_id"] == sale["vest_id"])
+            tax = calculate_correct_tax(sale, vest)
+            net_gain = (sale["sale_price"] * sale["shares_sold"]) - tax
             net_gains_data.append({
                 "Tax Year": tax_year,
                 "Sale ID": sale["sale_id"],
@@ -341,8 +361,8 @@ def generate_net_gains_table(grants):
                 "Amount": net_gain,
                 "Grant ID": grant["grant_id"],
             })
-            vest = next(v for v in grant["vests"] if v["vest_id"] == sale["vest_id"])
-            total_taxes_paid = sale["capital_gains_tax"] + vest["tax_at_vest"]
+            
+            total_taxes_paid = tax + vest["tax_at_vest"]
             taxes_data.append({
                 "Tax Year": tax_year,
                 "Sale ID": sale["sale_id"],
@@ -350,9 +370,9 @@ def generate_net_gains_table(grants):
                 "Amount": total_taxes_paid,
                 "Grant ID": grant["grant_id"],
             })
-
-    if not net_gains_data and not taxes_data:
+    if not net_gains_data:
         return None
+
 
     df = pd.DataFrame(net_gains_data + taxes_data)
     df = df.sort_values(by=["Tax Year", "Sale ID"])

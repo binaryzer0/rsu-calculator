@@ -281,9 +281,11 @@ def add_sale_form():
                         "tax_rate_sale": tax_rate_sale,
                         "capital_gains": calculate_gains_at_sale(sale_price, vest["vest_price"], shares_sold),
                         "capital_gains_tax": calculate_capital_gains_tax(
-                            sale_price, vest["vest_price"], shares_sold, tax_rate_sale, held_over_year
+                            sale_price, vest["vest_price"], shares_sold, tax_rate_sale, held_over_year, holding_period
                         ),
                     })
+                    if holding_period <= 30:
+                        sale["tax_within_30_days"] = calculate_tax_at_vest(shares_sold, sale_price, tax_rate_sale)
                     st.success("Sale updated successfully!")
                 else:
                     new_sale = {
@@ -296,9 +298,11 @@ def add_sale_form():
                         "tax_rate_sale": tax_rate_sale,
                         "capital_gains": calculate_gains_at_sale(sale_price, vest["vest_price"], shares_sold),
                         "capital_gains_tax": calculate_capital_gains_tax(
-                            sale_price, vest["vest_price"], shares_sold, tax_rate_sale, held_over_year
+                            sale_price, vest["vest_price"], shares_sold, tax_rate_sale, held_over_year, holding_period
                         ),
                     }
+                    if holding_period <= 30:
+                        new_sale["tax_within_30_days"] = calculate_tax_at_vest(shares_sold, sale_price, tax_rate_sale)
                     grant["sales"].append(new_sale)
                     st.success("Sale added successfully!")
 
@@ -321,6 +325,12 @@ def add_sale_form():
                         sale["capital_gains"] = calculate_gains_at_sale(sale["sale_price"], vest["vest_price"], sale["shares_sold"])
 
                     vest = next(v for v in grant["vests"] if v["vest_id"] == sale["vest_id"])
+                    holding_period = (sale["sale_date"] - vest["vest_date"]).days
+                    if holding_period <= 30 and "tax_within_30_days" in sale:
+                        tax_at_sale = sale["tax_within_30_days"]
+                    else:
+                        tax_at_sale = sale["capital_gains_tax"]
+
                     sale_data.append({
                         "Sale ID": sale["sale_id"],
                         "Grant ID": grant["grant_id"],
@@ -332,7 +342,7 @@ def add_sale_form():
                         "Sale Price": sale["sale_price"],
                         "Tax Rate at Sale (%)": sale["tax_rate_sale"] * 100,
                         "Capital Gains": sale["capital_gains"],
-                        "Capital Gains Tax": sale["capital_gains_tax"],
+                        "Tax at Sale": tax_at_sale,
                     })
 
             sales_df = pd.DataFrame(sale_data)
@@ -346,7 +356,8 @@ def add_sale_form():
                     "Grant Date": {"disabled": True},
                     "Vest Date": {"disabled": True},
                     "Vest Price": {"disabled": True},
-                    "Capital Gains Tax": {"disabled": True},
+                    "Capital Gains Tax": {"disabled": True}, # Remove Capital Gains Tax
+                    "Tax at Sale":{"disabled":True}
                 },
             )
 
@@ -374,8 +385,11 @@ def add_sale_form():
                                 row["Shares Sold"],
                                 row["Tax Rate at Sale (%)"] / 100,
                                 held_over_year,
+                                holding_period
                             ),
                         })
+                        if holding_period <= 30:
+                            sale["tax_within_30_days"] = calculate_tax_at_vest(row["Shares Sold"], row["Sale Price"], row["Tax Rate at Sale (%)"] / 100)
                     st.success("Sales updated successfully!")
 
             st.warning("To add new sales, use the form above. The table is for editing or deleting existing data only.")
@@ -407,6 +421,12 @@ def add_summary_section():
                 sale["capital_gains"] = calculate_gains_at_sale(sale["sale_price"], vest["vest_price"], sale["shares_sold"])
 
             vest = next(v for v in grant["vests"] if v["vest_id"] == sale["vest_id"])
+            holding_period = (sale["sale_date"] - vest["vest_date"]).days
+            if holding_period <= 30 and "tax_within_30_days" in sale:
+                tax_at_sale = sale["tax_within_30_days"]
+            else:
+                tax_at_sale = sale["capital_gains_tax"]
+
             sale_data.append({
                 "Grant ID": grant["grant_id"],
                 "Grant Date": grant["grant_date"],
@@ -423,14 +443,13 @@ def add_summary_section():
                 "Sale Price": sale["sale_price"],
                 "Tax Rate at Sale (%)": sale["tax_rate_sale"] * 100,
                 "Total sale proceeds": sale["capital_gains"],
-                "Tax at sale": sale["capital_gains_tax"],
-                "Sale proceeds after taxes": sale["capital_gains"] - sale["capital_gains_tax"],
-                "Net Gain" : ((vest["vest_price"] * sale["shares_sold"] ) - vest["tax_at_vest"]) + (sale["capital_gains"] - sale["capital_gains_tax"])
+                "Tax at Sale": tax_at_sale,
+                "Sale proceeds after taxes": sale["capital_gains"] - tax_at_sale,
+                "Net Gain" : ((vest["vest_price"] * sale["shares_sold"] ) - vest["tax_at_vest"]) + (sale["capital_gains"] - tax_at_sale)
             })
 
     sales_df = pd.DataFrame(sale_data)
-    st.dataframe(
-        sales_df,
+    st.dataframe(sales_df,
         column_config={
             "Vest Price": st.column_config.NumberColumn(
                 help="The price of the stock at Vest in USD",
