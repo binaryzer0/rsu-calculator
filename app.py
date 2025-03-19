@@ -321,6 +321,7 @@ def add_sale_form():
                             sale["shares_sold"],
                             sale["tax_rate_sale"],
                             held_over_year,
+                            holding_period,
                         )
                         sale["capital_gains"] = calculate_gains_at_sale(sale["sale_price"], vest["vest_price"], sale["shares_sold"])
 
