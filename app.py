@@ -379,6 +379,7 @@ def add_sale_form():
                             "shares_sold": row["Shares Sold"],
                             "sale_price": row["Sale Price"],
                             "tax_rate_sale": row["Tax Rate at Sale (%)"] / 100,
+#                           def calculate_capital_gains_tax(sale_price, vest_price, shares_sold, tax_rate, held_over_year, days_between_vest_and_sale)
                             "capital_gains_tax": calculate_capital_gains_tax(
                                 row["Sale Price"],
                                 vest["vest_price"],
