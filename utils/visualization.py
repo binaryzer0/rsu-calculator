@@ -120,22 +120,26 @@ def plot_tax_breakdown(grants):
         x="Tax Year",
         y="Amount",
         color="Type",
-        title="Tax type breakdown by Australian Financial year",
+        title="Tax Breakdown by Financial Year", # Slightly shorter title
         barmode="stack",
-        labels={"Amount": "Tax Amount ($)", "Event ID": "Event"},
-        hover_data=["Grant ID", "Type"],
+        labels={"Amount": "Tax Amount ($)", "Type": "Tax Type"}, # Updated label
+        hover_data=["Grant ID", "Event ID"], # Include Event ID for detail
+        template="plotly_white" # Apply theme
     )
     fig.update_traces(
+        hovertemplate="<b>%{customdata[1]}</b><br>Grant: %{customdata[0]}<br>Tax Year: %{x}<br>Type: %{data.name}<br>Amount: $%{y:,.2f}<extra></extra>", # Custom hover text
         marker_line_color="black",
-        marker_line_width=1,
+        marker_line_width=1.5, # Slightly thicker line
     )
 
     fig.update_layout(
-        xaxis_title="Tax Year",
+        xaxis_title="Australian Financial Year", # More specific axis title
         yaxis_title="Tax Amount ($)",
         showlegend=True,
-        legend_title="Event Type",
+        legend_title="Tax Type", # Updated legend title
         xaxis_tickangle=-45,
+        yaxis_tickprefix="$", # Add $ prefix to y-axis ticks
+        yaxis_tickformat=",.0f" # Format y-axis ticks
     )
 
     return fig
