@@ -587,7 +587,7 @@ def add_summary_section():
     #st.dataframe(sales_df)
 
 def main():
-    st.title("RSU Tax Calculator")
+    st.title("Aussie RSU Tax Calculator")
 
     # st.markdown("***This web app allows you to load RSU/Stocks data and calculate taxes for Australian financial year. Data is stored in the browser session so no data is sent back to server. As always, use at your own risk and this is not a financial advice at all.***")
     st.markdown("*Sample data available at:* ***https://raw.githubusercontent.com/binaryzer0/rsu-calculator/main/sample.json***")
@@ -606,8 +606,8 @@ def main():
         }
         </style>
         <div class="small-font">
-            <strong>RSU Tax Calculator – Simplify Your Equity Taxes</strong><br><br>
-                Easily manage your Restricted Stock Units (RSUs) with this intuitive tax calculator.
+            <strong>Aussie RSU Tax Calculator – Simplify Your Equity Taxes</strong><br><br>
+                Easily manage your Restricted Stock Units (RSUs) with this intuitive tax calculator built for Aussie tax code.
                 Track grants, vesting, and sales while automatically calculating taxes at each stage.
                 Visualize your tax breakdown, capital gains, and stock performance with interactive charts.
                 Stay in control of your RSU strategy and maximize your financial outcomes—all in one place.
